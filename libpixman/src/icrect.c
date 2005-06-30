@@ -1,5 +1,5 @@
 /*
- * Copyright © 2000 Keith Packard
+ * Copyright Â© 2000 Keith Packard
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -146,8 +146,6 @@ pixman_color_rects (pixman_image_t	 *dst,
 				 clipPict->alphaOrigin.x,
 				 clipPict->alphaOrigin.y);
     }
-    if (clipPict->clientClipType != CT_NONE)
-	pixman_region_intersect (clip, clip, clipPict->clientClip);
 
     if (xoff || yoff)
     {

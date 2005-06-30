@@ -1,5 +1,5 @@
 /*
- * Copyright © 2000 SuSE, Inc.
+ * Copyright Â© 2000 SuSE, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -22,11 +22,6 @@
  */
 
 #include "icint.h"
-
-#ifndef __GNUC__
-#define __inline
-#endif
-
 
 #define cvt8888to0565(s)    ((((s) >> 3) & 0x001f) | \
 			     (((s) >> 5) & 0x07e0) | \
@@ -997,7 +992,6 @@ pixman_composite (pixman_operator_t	op,
 	{
 	    switch (iSrc->format_code) {
 	    case PICT_a8r8g8b8:
-	    case PICT_x8r8g8b8:
 		switch (iDst->format_code) {
 		case PICT_a8r8g8b8:
 		case PICT_x8r8g8b8:
@@ -1012,7 +1006,6 @@ pixman_composite (pixman_operator_t	op,
 		}
 		break;
 	    case PICT_a8b8g8r8:
-	    case PICT_x8b8g8r8:
 		switch (iDst->format_code) {
 		case PICT_a8b8g8r8:
 		case PICT_x8b8g8r8:

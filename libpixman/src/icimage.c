@@ -1,5 +1,5 @@
 /*
- * Copyright © 2000 SuSE, Inc.
+ * Copyright Â© 2000 SuSE, Inc.
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -243,14 +243,20 @@ pixman_image_get_data (pixman_image_t	*image)
 void
 pixman_image_destroy (pixman_image_t *image)
 {
-    if (image->freeCompClip)
+    if (image->freeCompClip) {
 	pixman_region_destroy (image->pCompositeClip);
+	image->pCompositeClip = NULL;
+    }
 
-    if (image->owns_pixels)
+    if (image->owns_pixels) {
 	IcPixelsDestroy (image->pixels);
+	image->pixels = NULL;
+    }
 
-    if (image->transform)
+    if (image->transform) {
 	free (image->transform);
+	image->transform = NULL;
+    }
 
     free (image);
 }
@@ -283,6 +289,22 @@ pixman_image_set_clip_region (pixman_image_t	*image,
 	pixman_region_copy (image->clientClip, region);
 	image->clientClipType = CT_REGION;
     }
+    
+    image->pCompositeClip = pixman_region_create();
+    pixman_region_union_rect (image->pCompositeClip, image->pCompositeClip,
+			      0, 0, image->pixels->width, image->pixels->height);
+    if (region) {
+	pixman_region_translate (image->pCompositeClip,
+				 - image->clipOrigin.x,
+				 - image->clipOrigin.y);
+	pixman_region_intersect (image->pCompositeClip,
+				 image->pCompositeClip,
+				 region);
+	pixman_region_translate (image->pCompositeClip,
+				 image->clipOrigin.x,
+				 image->clipOrigin.y);
+    }
+    
     image->stateChanges |= CPClipMask;
     return 0;
 }
@@ -629,13 +651,37 @@ IcComputeCompositeRegion (pixman_region16_t	*region,
 	    return 0;
 	}
     }
-    if (iDst->clientClipType != CT_NONE) {
-	if (!IcClipImageReg (region, iDst->clientClip, 0, 0))
-        {
-	    pixman_region_destroy (region);
-	    return 0;
-        }
-    }
     return 1;
 }
 
+int
+miIsSolidAlpha (pixman_image_t *src)
+{
+    char	line[1];
+    
+    /* Alpha-only */
+    if (PICT_FORMAT_TYPE (src->format_code) != PICT_TYPE_A)
+	return 0;
+    /* repeat */
+    if (!src->repeat)
+	return 0;
+    /* 1x1 */
+    if (src->pixels->width != 1 || src->pixels->height != 1)
+	return 0;
+    line[0] = 1;
+    /* XXX: For the next line, fb has:
+	(*pScreen->GetImage) (src->pixels, 0, 0, 1, 1, ZPixmap, ~0L, line);
+       Is the following simple assignment sufficient?
+    */
+    line[0] = src->pixels->data[0];
+    switch (src->pixels->bpp) {
+    case 1:
+	return (uint8_t) line[0] == 1 || (uint8_t) line[0] == 0x80;
+    case 4:
+	return (uint8_t) line[0] == 0xf || (uint8_t) line[0] == 0xf0;
+    case 8:
+	return (uint8_t) line[0] == 0xff;
+    default:
+	return 0;
+    }
+}

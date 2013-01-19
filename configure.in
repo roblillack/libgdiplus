@@ -12,11 +12,11 @@ AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 if test "x$PKG_CONFIG" = "xno"; then
 	AC_MSG_ERROR([You need to install pkg-config])
 fi
-GLIB_REQUIRED_VERSION="2.2.3"
-PKG_CHECK_MODULES(BASE_DEPENDENCIES, glib-2.0 >= $GLIB_REQUIRED_VERSION)
+#GLIB_REQUIRED_VERSION="2.2.3"
+#PKG_CHECK_MODULES(BASE_DEPENDENCIES, glib-2.0 >= $GLIB_REQUIRED_VERSION)
 
-GDIPLUS_LIBS="`pkg-config --libs glib-2.0 `"
-GDIPLUS_CFLAGS="`pkg-config --cflags glib-2.0 `"
+GDIPLUS_LIBS=""#`pkg-config --libs glib-2.0 `"
+GDIPLUS_CFLAGS=""#`pkg-config --cflags glib-2.0 `"
 
 # libgdiplus bundles its own cairo 1.6.4 but if the system cairo is more recent then we use it instead
 CAIRO_BUNDLED_VERSION="1.6.4"
@@ -37,6 +37,7 @@ if test $cairo_v = "internal"; then
 # gdiplus mac note; if we have quartz and ft fonts, quartz is the default and gdi+ assumes the latter everywhere, force it out
 # of the internal build
 	ac_configure_args="$ac_configure_args --disable-quartz-font"
+	ac_configure_args="$ac_configure_args --disable-xlib"
 
 	AC_CONFIG_SUBDIRS([pixman cairo])
 	CAIRO_DIR="pixman cairo"
@@ -385,15 +386,6 @@ else
 fi
 AM_CONDITIONAL(HAVE_LIBEXIF, test x$libexif_pkgconfig = xyes)
 
-dnl
-dnl Produce a diagnostic, to reduce support time
-dnl
-AC_TRY_COMPILE([#include <X11/Xlib.h>],
-			 [],[x11_failed=false],[x11_failed=true])
-if $x11_failed; then
-   AC_ERROR("Failed to compile with X11/Xlib.h include.  You must fix your compiler paths")
-fi
-
 GDIPLUS_PKG_LIBS="$GDIPLUS_LIBS"
 GDIPLUS_PKG_CFLAGS="$GDIPLUS_CFLAGS"
  
@@ -408,8 +400,7 @@ AC_OUTPUT([
 Makefile
 libgdiplus.pc
 libgdiplus0.spec
-src/Makefile
-tests/Makefile])
+src/Makefile])
 
 echo "---"
 echo "Configuration summary"

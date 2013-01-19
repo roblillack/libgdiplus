@@ -39,7 +39,7 @@
 #if HAVE_VISIBILITY_HIDDEN
 	#define GDIP_INTERNAL __attribute__((visibility ("hidden")))
 #else
-	#define GDIP_INTERNAL 
+	#define GDIP_INTERNAL
 #endif
 
 #ifdef USE_INCLUDED_CAIRO
@@ -63,7 +63,9 @@
 	#endif
 #endif
 
-#include <X11/Xlib.h>
+typedef gpointer Display;
+typedef gpointer Drawable;
+typedef gpointer Window;
 
 #include "win32structs.h"
 #include "gdipenums.h"

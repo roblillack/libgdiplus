@@ -122,6 +122,9 @@ gdip_get_status (cairo_status_t status)
 float
 gdip_get_display_dpi ()
 {
+#if __QNX__
+	return 96.0f;
+#else
 	static float dpis = 0;
 	Display* display;
 
@@ -152,6 +155,7 @@ gdip_get_display_dpi ()
 	}
 
 	return dpis;
+#endif
 }
 
 

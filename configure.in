@@ -21,6 +21,7 @@ GDIPLUS_CFLAGS=""#`pkg-config --cflags glib-2.0 `"
 # libgdiplus bundles its own cairo 1.6.4 but if the system cairo is more recent then we use it instead
 CAIRO_BUNDLED_VERSION="1.6.4"
 PKG_CHECK_MODULES(CAIRO, cairo > $CAIRO_BUNDLED_VERSION, [cairo_v=system], [cairo_v=internal])
+AC_ARG_WITH(intcairo, [  --with-intcairo], [cairo_v=internal])
 
 # Optional use (experimental and unsupported) of Pango's text rendering on top of Cairo
 AC_ARG_WITH(pango, [  --with-pango],[text_v=pango],[text_v=cairo])
